@@ -21,6 +21,11 @@ class Posts(models.Model):
 
   # 슬러그 없을시 고유 슬러그 추가해서 포스트 모델 생성 메서드
   def save(self, *args, ** kwargs):
+    # 중첩 조건문 형태
+    # 만약 인스턴스에 slug값이 없으면 타이틀 값으로 슬러그 생성
+
+    # 모델 인스턴스 생성 시 slug항목이 없으면 제목값을 슬러그화해서 대신 저장
+    # slug=''
     if not self.slug:
       
       #추후 게시글 필터링할 때 필요한 기본 슬러그 생성
@@ -28,7 +33,11 @@ class Posts(models.Model):
       slug = slug_base
 
       #슬러그가 고유값인지 확인후 필요시 슬러그명 수정
+      # 중간에 빈 문자가 있을 경우 에러가 날 수 있으니 주의!
       if Posts.objects.filter(slug=slug).exists():
-        slug= f'{slug_base} - {get_random_string(5)}'
+        slug= f'{slug_base}-{get_random_string(5)}'
       self.slug = slug
+
+      # 조건문 밖에서 실행되는 최종 모델 저장 구문
+      # 위에서 조건처리 완료된 최종 모델인스턴스 테이블에 저장
     super(Posts, self).save(*args, **kwargs)
